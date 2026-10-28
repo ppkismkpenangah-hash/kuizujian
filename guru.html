@@ -50,7 +50,7 @@ async function masuk(){
   try{const d=await call({a:'guru'});if(d.err){KOD='';login('Kod salah. Cuba lagi.');return}R=d.r;I=d.i;show()}
   catch(x){login('Tidak dapat membaca data. Semak URL Apps Script dan deploy versi terbaharu.')}
 }
-function fd(ms){const p={};new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kuala_Lumpur',hourCycle:'h23',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit',second:'2-digit'}).formatToParts(ms).forEach(x=>p[x.type]=x.value);return p.month+'/'+p.day+'/'+p.year+' '+p.hour+':'+p.minute+':'+p.second}
+function fd(ms){const p={};new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kuala_Lumpur',hourCycle:'h23',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit',second:'2-digit'}).formatToParts(ms).forEach(x=>p[x.type]=x.value);const z=v=>String(v).padStart(2,'0');return z(p.day)+'/'+z(p.month)+'/'+p.year+' '+z(p.hour)+':'+p.minute+':'+p.second}
 let RQ=[];
 function reqs(){
   RQ=R.filter(x=>x.q&&x.st!='Diulang');
@@ -65,7 +65,7 @@ function show(){
   h+=reqs()+'<h2>Mengikut mata pelajaran</h2><div class="w"><table><tr><th>Mata pelajaran</th><th>Murid selesai</th><th>Purata (%)</th></tr>'+grp(done,x=>x.sub).map(([s,a])=>`<tr><td>${e(s)}</td><td>${a.length}</td><td>${av(a)}</td></tr>`).join('')+'</table></div>';
   G=grp(done,x=>x.sub+'|'+x.t);
   h+='<h2>Mengikut set</h2><div class="w"><table><tr><th>Mata pelajaran</th><th>Set</th><th>Selesai</th><th>Purata (%)</th><th>Tertinggi</th><th>Terendah</th><th>Analisis soalan</th></tr>'+G.map(([k,a],i)=>{const p=a.map(pc);return `<tr><td>${e(a[0].sub)}</td><td>${e(a[0].t)}</td><td>${a.length}</td><td>${av(a)}</td><td>${Math.max(...p)}</td><td>${Math.min(...p)}</td><td><button onclick="it(${i})">Lihat</button></td></tr><tr id="it${i}" hidden><td colspan="7"></td></tr>`}).join('')+'</table></div>';
-  h+='<h2>Mengikut murid</h2><div class="w"><table><tr><th>Nama</th><th>Kelas</th><th>Mata pelajaran</th><th>Set</th><th>Percubaan</th><th>Tarikh dan Masa</th><th>Markah</th><th>%</th><th>Status</th><th></th></tr>'+rows.map((x,i)=>`<tr><td>${e(x.n)}</td><td>${e(x.k)}</td><td>${e(x.sub)}</td><td>${e(x.t)}</td><td>${x.p}</td><td>${x.d?fd(x.d):'-'}</td><td>${x.m!==''?x.m+' / '+x.z:'-'}</td><td>${x.m!==''?pc(x):'-'}</td><td>${e(x.st)}</td><td>${x.st=='Diulang'?'':`<button onclick="rs(${i})">Set semula</button>`}</td></tr>`).join('')+'</table></div>';
+  h+='<h2>Mengikut murid</h2><div class="w"><table><tr><th>Tarikh dan Masa</th><th>Nama</th><th>Kelas</th><th>Mata pelajaran</th><th>Set</th><th>Percubaan</th><th>Markah</th><th>%</th><th>Status</th><th></th></tr>'+rows.map((x,i)=>`<tr><td>${x.d?fd(x.d):'-'}</td><td>${e(x.n)}</td><td>${e(x.k)}</td><td>${e(x.sub)}</td><td>${e(x.t)}</td><td>${x.p}</td><td>${x.m!==''?x.m+' / '+x.z:'-'}</td><td>${x.m!==''?pc(x):'-'}</td><td>${e(x.st)}</td><td>${x.st=='Diulang'?'':`<button onclick="rs(${i})">Set semula</button>`}</td></tr>`).join('')+'</table></div>';
   $('app').innerHTML=h;
 }
 function it(i){

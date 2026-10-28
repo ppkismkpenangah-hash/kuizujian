@@ -59,7 +59,7 @@ function reqs(){
 }
 async function lulus(i){const x=RQ[i];try{await call({a:'reset',n:x.n,t:x.t});masuk()}catch(z){alert('Gagal. Cuba lagi.')}}
 function show(){
-  const subs=[...new Set(R.map(x=>x.sub))],rows=R.filter(x=>!F||x.sub==F).sort((a,b)=>(a.n+a.t).localeCompare(b.n+b.t)||a.p-b.p),done=rows.filter(x=>x.p==1&&x.m!=='');
+  const subs=[...new Set(R.map(x=>x.sub))],rows=R.filter(x=>!F||x.sub==F).sort((a,b)=>(b.d||0)-(a.d||0)||(a.n+a.t).localeCompare(b.n+b.t)),done=rows.filter(x=>x.p==1&&x.m!=='');
   M=rows;
   let h=`<div id="bar"><select onchange="F=this.value;show()"><option value="">Semua mata pelajaran</option>${subs.map(s=>`<option ${s==F?'selected':''}>${e(s)}</option>`).join('')}</select> <button onclick="masuk()">🔄 Muat semula</button> <button onclick="print()">🖨 Cetak</button></div>`;
   h+=reqs()+'<h2>Mengikut mata pelajaran</h2><div class="w"><table><tr><th>Mata pelajaran</th><th>Murid selesai</th><th>Purata (%)</th></tr>'+grp(done,x=>x.sub).map(([s,a])=>`<tr><td>${e(s)}</td><td>${a.length}</td><td>${av(a)}</td></tr>`).join('')+'</table></div>';

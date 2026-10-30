@@ -90,10 +90,10 @@ function skTog(f){SKON=!SKON;try{localStorage.setItem('sk',SKON?'1':'0')}catch(x
 const skBtn=f=>`<button class="btn" style="min-height:48px;font-size:.8em;margin:6px 0" onclick="skTog('${f}')">🎨 Warna suku kata: ${SKON?'Hidup':'Mati'}</button>`;
 
 // Kelajuan suara untuk nota (perlahan supaya murid boleh mengajuk)
-const NRL=[['Sangat perlahan',.5],['Perlahan',.65],['Biasa',.9]];
-let NRI=1;try{const z=+localStorage.getItem('nr');if(z>=0&&z<3)NRI=z}catch(x){}
+const NRL=[['Paling perlahan (belajar membaca)',.3],['Sangat perlahan',.5],['Perlahan',.65],['Biasa',.9]];
+let NRI=1;try{const z=localStorage.getItem('nr2');if(z!==null&&+z>=0&&+z<4)NRI=+z}catch(x){}
 const nsay=(t,cb)=>say(t,cb,NRL[NRI][1]);
-function nrTog(){NRI=(NRI+1)%3;try{localStorage.setItem('nr',NRI)}catch(x){}auto=false;at++;speechSynthesis.cancel();nv()}
+function nrTog(){NRI=(NRI+1)%4;try{localStorage.setItem('nr2',NRI)}catch(x){}auto=false;at++;speechSynthesis.cancel();nv()}
 const nrBtn=()=>`<button class="btn" style="min-height:48px;font-size:.8em;margin:6px 0" onclick="nrTog()">🐢 Kelajuan suara: ${NRL[NRI][0]}</button>`;
 const api=async q=>(await fetch(API+'?'+new URLSearchParams(q))).json();
 const DL=$('hl').src;let WA='60176308327';

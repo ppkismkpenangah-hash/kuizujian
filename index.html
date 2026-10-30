@@ -55,11 +55,19 @@ const v=h=>{$('app').innerHTML=h};
 // ===== Warna suku kata =====
 let SKON=true;try{SKON=localStorage.getItem('sk')!=='0'}catch(x){}
 const SKV='aeiou',SKD=['ng','ny','sy','kh','gh'],SKP=['ai','au','oi'];
+// Pengecualian: tambah perkataan di sini jika pecahan salah. Contoh: 'berasal':'ber-a-sal'
+const SKX={berasal:'ber-a-sal',iaitu:'i-a-i-tu'};
+// Akar kata bermula huruf vokal yang menerima awalan ber- (ber-a-sal, ber-u-bah, ber-i-kut)
+const SKR=['asal','ada','adab','adil','agama','ajar','akhir','alas','alih','amal','anak','angkat','antara','asas','atas','atur','ubah','ukur','ulang','umur','untung','urut','usaha','usul','usia','utama','isi','ikut','ikat','imbang','ibadah','ingat','ilmu','edar','ekor','emosi','erti','olah','orang','otot','arti','awal','ayat'];
 function skPecah(w){
-  const l=w.toLowerCase(),u=[];let i=0;
+  const l=w.toLowerCase();
+  if(SKX[l]){const r=[];let p=0;SKX[l].split('-').forEach(x=>{r.push(w.substr(p,x.length));p+=x.length});return r}
+  const m=l.match(/^(ber)([aeiou].*)$/);
+  if(m&&SKR.some(r=>m[2].startsWith(r)))return[w.slice(0,3)].concat(skPecah(w.slice(3)));
+  const u=[];let i=0;
   while(i<l.length){
     const d=l.substr(i,2);
-    if(SKP.includes(d)&&l!=='air'){u.push({t:'V',s:d});i+=2}
+    if(SKP.includes(d)&&l!=='air'&&!(u.length&&u[u.length-1].t=='V')){u.push({t:'V',s:d});i+=2}
     else if(SKV.includes(l[i])){u.push({t:'V',s:l[i]});i++}
     else if(SKD.includes(d)){u.push({t:'C',s:d});i+=2}
     else{u.push({t:'C',s:l[i]});i++}
@@ -72,9 +80,9 @@ function skPecah(w){
     cut.push(n==0?q:n==1?p+1:p+2);
   }
   cut.push(u.length);
-  const len=u.map(x=>x.s.length),r=[];let pos=0;
-  const off=[0];len.forEach(n=>off.push(off[off.length-1]+n));
-  for(let k=0;k<cut.length-1;k++){r.push(w.slice(off[cut[k]],off[cut[k+1]]))}
+  const off=[0];u.forEach(x=>off.push(off[off.length-1]+x.s.length));
+  const r=[];
+  for(let k=0;k<cut.length-1;k++)r.push(w.slice(off[cut[k]],off[cut[k+1]]));
   return r.filter(x=>x);
 }
 function sk(t){
@@ -90,10 +98,10 @@ function skTog(f){SKON=!SKON;try{localStorage.setItem('sk',SKON?'1':'0')}catch(x
 const skBtn=f=>`<button class="btn" style="min-height:48px;font-size:.8em;margin:6px 0" onclick="skTog('${f}')">🎨 Warna suku kata: ${SKON?'Hidup':'Mati'}</button>`;
 
 // Kelajuan suara untuk nota (perlahan supaya murid boleh mengajuk)
-const NRL=[['Paling perlahan (belajar membaca)',.3],['Sangat perlahan',.5],['Perlahan',.65],['Biasa',.9]];
-let NRI=1;try{const z=localStorage.getItem('nr2');if(z!==null&&+z>=0&&+z<4)NRI=+z}catch(x){}
-const nsay=(t,cb)=>say(t,cb,NRL[NRI][1]);
-function nrTog(){NRI=(NRI+1)%4;try{localStorage.setItem('nr2',NRI)}catch(x){}auto=false;at++;speechSynthesis.cancel();nv()}
+const NRL=[['Biasa',.9,0],['Perlahan',.65,0],['Sangat perlahan',.5,0],['Paling perlahan',.3,0],['Amat perlahan',.2,0],['Amat perlahan + jeda antara perkataan',.2,1]];
+let NRI=2;try{const z=localStorage.getItem('nr3');if(z!==null&&+z>=0&&+z<NRL.length)NRI=+z}catch(x){}
+const nsay=(t,cb)=>{const L=NRL[NRI];say(L[2]?String(t).replace(/\s+/g,', '):t,cb,L[1])};
+function nrTog(){NRI=(NRI+1)%NRL.length;try{localStorage.setItem('nr3',NRI)}catch(x){}auto=false;at++;speechSynthesis.cancel();nv()}
 const nrBtn=()=>`<button class="btn" style="min-height:48px;font-size:.8em;margin:6px 0" onclick="nrTog()">🐢 Kelajuan suara: ${NRL[NRI][0]}</button>`;
 const api=async q=>(await fetch(API+'?'+new URLSearchParams(q))).json();
 const DL=$('hl').src;let WA='60176308327';

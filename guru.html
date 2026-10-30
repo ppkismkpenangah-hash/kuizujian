@@ -45,7 +45,9 @@ function cfgApply(c){
 }
 try{cfgApply(JSON.parse(localStorage.getItem('cfg')))}catch(x){}
 (async()=>{try{cfgApply((await(await fetch(API+'?a=init')).json()).cfg)}catch(x){}})();
-let KOD='',R=[],I={},F='',G=[],M=[];
+let KOD='',R=[],I={},F='',G=[],M=[],SO='d';
+const cv=(a,b)=>String(a||'').localeCompare(String(b||''),'ms',{numeric:true});
+const SF={d:()=>0,n:(a,b)=>cv(a.n,b.n),k:(a,b)=>cv(a.k,b.k)||cv(a.n,b.n),s:(a,b)=>cv(a.sub,b.sub)||cv(a.t,b.t)||cv(a.n,b.n)};
 const pc=x=>x.z?Math.round(x.m/x.z*100):0;
 const av=a=>a.length?Math.round(a.reduce((s,x)=>s+pc(x),0)/a.length):0;
 const grp=(a,f)=>{const o={};a.forEach(x=>(o[f(x)]=o[f(x)]||[]).push(x));return Object.entries(o)};
@@ -66,13 +68,13 @@ function reqs(){
 }
 async function lulus(i){const x=RQ[i];try{await call({a:'reset',n:x.n,sub:x.sub,t:x.t});masuk()}catch(z){alert('Gagal. Cuba lagi.')}}
 function show(){
-  const subs=[...new Set(R.map(x=>x.sub))],rows=R.filter(x=>!F||x.sub==F).sort((a,b)=>(b.d||0)-(a.d||0)||(a.n+a.t).localeCompare(b.n+b.t)),done=rows.filter(x=>x.p==1&&x.m!=='');
+  const subs=[...new Set(R.map(x=>x.sub))],rows=R.filter(x=>!F||x.sub==F).sort((a,b)=>SF[SO](a,b)||(b.d||0)-(a.d||0)||cv(a.n+a.t,b.n+b.t)),done=rows.filter(x=>x.p==1&&x.m!=='');
   M=rows;
-  let h=`<div id="bar"><select onchange="F=this.value;show()"><option value="">Semua mata pelajaran</option>${subs.map(s=>`<option ${s==F?'selected':''}>${e(s)}</option>`).join('')}</select> <button onclick="masuk()">🔄 Muat semula</button> <button onclick="print()">🖨 Cetak</button></div>`;
+  let h=`<div id="bar"><select onchange="F=this.value;show()"><option value="">Semua mata pelajaran</option>${subs.map(s=>`<option ${s==F?'selected':''}>${e(s)}</option>`).join('')}</select> <select onchange="SO=this.value;show()" aria-label="Susun rekod murid">${[['d','Susun: Terkini'],['n','Susun: Nama murid'],['k','Susun: Kelas'],['s','Susun: Mata pelajaran']].map(([v,l])=>`<option value="${v}" ${v==SO?'selected':''}>${l}</option>`).join('')}</select> <button onclick="masuk()">🔄 Muat semula</button> <button onclick="print()">🖨 Cetak</button></div>`;
   h+=reqs()+'<h2>Mengikut mata pelajaran</h2><div class="w"><table><tr><th>Mata pelajaran</th><th>Murid selesai</th><th>Purata (%)</th></tr>'+grp(done,x=>x.sub).map(([s,a])=>`<tr><td>${e(s)}</td><td>${a.length}</td><td>${av(a)}</td></tr>`).join('')+'</table></div>';
   G=grp(done,x=>x.sub+'|'+x.t);
   h+='<h2>Mengikut set</h2><div class="w"><table><tr><th>Mata pelajaran</th><th>Set</th><th>Selesai</th><th>Purata (%)</th><th>Tertinggi</th><th>Terendah</th><th>Analisis soalan</th></tr>'+G.map(([k,a],i)=>{const p=a.map(pc);return `<tr><td>${e(a[0].sub)}</td><td>${e(a[0].t)}</td><td>${a.length}</td><td>${av(a)}</td><td>${Math.max(...p)}</td><td>${Math.min(...p)}</td><td><button onclick="it(${i})">Lihat</button></td></tr><tr id="it${i}" hidden><td colspan="7"></td></tr>`}).join('')+'</table></div>';
-  h+='<h2>Mengikut murid</h2><div class="w"><table><tr><th>Tarikh dan Masa</th><th>Nama</th><th>Kelas</th><th>Mata pelajaran</th><th>Set</th><th>Percubaan</th><th>Markah</th><th>%</th><th>Status</th><th></th></tr>'+rows.map((x,i)=>`<tr><td>${x.d?fd(x.d):'-'}</td><td>${e(x.n)}</td><td>${e(x.k)}</td><td>${e(x.sub)}</td><td>${e(x.t)}</td><td>${x.p}</td><td>${x.m!==''?x.m+' / '+x.z:'-'}</td><td>${x.m!==''?pc(x):'-'}</td><td>${e(x.st)}</td><td>${x.st=='Diulang'?'':`<button onclick="rs(${i})">Set semula</button>`+(x.st!='Selesai'?` <button class="dl" onclick="pd(${i})">Padam</button>`:'')}</td></tr>`).join('')+'</table></div>';
+  h+='<h2>Rekod murid</h2><div class="w"><table><tr><th>Tarikh dan Masa</th><th>Nama</th><th>Kelas</th><th>Mata pelajaran</th><th>Set</th><th>Percubaan</th><th>Markah</th><th>%</th><th>Status</th><th></th></tr>'+rows.map((x,i)=>`<tr><td>${x.d?fd(x.d):'-'}</td><td>${e(x.n)}</td><td>${e(x.k)}</td><td>${e(x.sub)}</td><td>${e(x.t)}</td><td>${x.p}</td><td>${x.m!==''?x.m+' / '+x.z:'-'}</td><td>${x.m!==''?pc(x):'-'}</td><td>${e(x.st)}</td><td>${x.st=='Diulang'?'':`<button onclick="rs(${i})">Set semula</button>`+(x.st!='Selesai'?` <button class="dl" onclick="pd(${i})">Padam</button>`:'')}</td></tr>`).join('')+'</table></div>';
   $('app').innerHTML=h;
 }
 function it(i){

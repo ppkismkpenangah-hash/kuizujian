@@ -56,14 +56,16 @@ const v=h=>{$('app').innerHTML=h};
 let SKON=true;try{SKON=localStorage.getItem('sk')!=='0'}catch(x){}
 const SKV='aeiou',SKD=['ng','ny','sy','kh','gh'],SKP=['ai','au','oi'];
 // Pengecualian: tambah perkataan di sini jika pecahan salah. Contoh: 'berasal':'ber-a-sal'
-const SKX={berasal:'ber-a-sal',iaitu:'i-a-i-tu'};
-// Akar kata bermula huruf vokal yang menerima awalan ber- (ber-a-sal, ber-u-bah, ber-i-kut)
-const SKR=['asal','ada','adab','adil','agama','ajar','akhir','alas','alih','amal','anak','angkat','antara','asas','atas','atur','ubah','ukur','ulang','umur','untung','urut','usaha','usul','usia','utama','isi','ikut','ikat','imbang','ibadah','ingat','ilmu','edar','ekor','emosi','erti','olah','orang','otot','arti','awal','ayat'];
+const SKX={iaitu:'i-a-i-tu',daun:'da-un',pengantin:'pe-ngan-tin',penguin:'pen-guin',berasa:'be-ra-sa',berenang:'be-re-nang',berehat:'be-re-hat',beracun:'be-ra-cun',beragam:'be-ra-gam',beringin:'be-ri-ngin'};
+// Perkataan ber- yang BUKAN awalan (beras, berat, berani, berapa, berita, beranda, berus), termasuk akhiran lazim
+const SKB=/^(beras|berat|berani|berapa|berita|beranda|berus|berek)(an|kan|nya|lah|kah|i)?$/;
+const SKL=['p','b','t','d','k','g','f'];
 function skPecah(w){
   const l=w.toLowerCase();
   if(SKX[l]){const r=[];let p=0;SKX[l].split('-').forEach(x=>{r.push(w.substr(p,x.length));p+=x.length});return r}
-  const m=l.match(/^(ber)([aeiou].*)$/);
-  if(m&&SKR.some(r=>m[2].startsWith(r)))return[w.slice(0,3)].concat(skPecah(w.slice(3)));
+  // Awalan yang mengekalkan konsonan akhirnya: ber-/meng-/peng- + huruf vokal (ber-a-sal, meng-a-mal-kan, peng-u-ru-tan)
+  let m=l.match(/^(ber|meng|peng)[aeiou]/);
+  if(m&&!(m[1]=='ber'&&SKB.test(l))&&l.length>m[1].length+1)return[w.slice(0,m[1].length)].concat(skPecah(w.slice(m[1].length)));
   const u=[];let i=0;
   while(i<l.length){
     const d=l.substr(i,2);
@@ -77,7 +79,13 @@ function skPecah(w){
   const cut=[0];
   for(let a=0;a<vs.length-1;a++){
     const p=vs[a],q=vs[a+1],n=q-p-1;
-    cut.push(n==0?q:n==1?p+1:p+2);
+    let on=1;
+    if(n>=3){
+      const c=u.slice(p+1,q).map(x=>x.s),z=c.length;
+      if(z>=4&&c[z-3]=='s'&&['t','k','p'].includes(c[z-2])&&['r','l'].includes(c[z-1]))on=3;
+      else if(SKL.includes(c[z-2])&&['r','l'].includes(c[z-1]))on=2;
+    }
+    cut.push(n==0?q:q-on);
   }
   cut.push(u.length);
   const off=[0];u.forEach(x=>off.push(off[off.length-1]+x.s.length));
@@ -90,7 +98,7 @@ function sk(t){
   if(!SKON)return e(t);
   return t.split(/([A-Za-z\u00C0-\u024F]+)/).map((p,i)=>{
     if(i%2==0)return e(p);
-    if(p.length<2||p==p.toUpperCase())return e(p);
+    if(p.length<2||(p==p.toUpperCase()&&p.length<=4))return e(p);
     return skPecah(p).map((s,j)=>`<span class="s${j%2}">${e(s)}</span>`).join('');
   }).join('');
 }

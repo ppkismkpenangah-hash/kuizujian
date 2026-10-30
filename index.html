@@ -106,9 +106,10 @@ async function nopen(i){
   try{
     const r=await api({a:'nota',i});
     if(r.u){v(`<p>Nota jenis ini dibuka dalam tab baharu dan tiada suara dalam aplikasi.</p><a class="btn p" href="${e(r.u)}" target="_blank">Buka nota</a><button class="btn" onclick="home()">⬅ Kembali</button>`);return}
+    if(r.err)throw r.m||0;
     if(!r.k||!r.k.length)throw 0;
     NK=r.k;nc=0;auto=false;nv();
-  }catch(x){v('<p>Tidak dapat membuka nota. Semak pautan dan perkongsian fail.</p><button class="btn" onclick="nota()">⬅ Kembali</button>')}
+  }catch(x){v('<p>Tidak dapat membuka nota. Semak pautan dan perkongsian fail.</p>'+(typeof x=='string'?'<p><small>Sebab: '+e(x)+'</small></p>':'')+'<button class="btn" onclick="nota()">⬅ Kembali</button>')}
 }
 function nv(){
   const k=NK[nc],N=NK.length;

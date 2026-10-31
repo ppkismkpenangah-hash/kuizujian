@@ -274,7 +274,7 @@ function rev(r){
 }
 function dah(){
   clearInterval(timer);busy=false;const t='Set soalan ini sudah dijawab';
-  v(`<div class="end"><b>🌟</b><h2>${t}</h2><p>Mahu cuba lagi? Minta Cikgu set semula.</p><button class="btn" onclick="wa()">💬 Minta melalui WhatsApp</button><button class="btn" onclick="mt()">🔔 Minta dalam aplikasi</button><p id="ms"></p><button class="btn p" onclick="home()">Kembali ke halaman utama</button></div>`);say(t);
+  v(`<div class="end"><b>🌟</b><h2>${t}</h2><p>Mahu cuba lagi? Minta Cikgu set semula.</p><button class="btn" onclick="wa()">💬 Minta melalui WhatsApp</button><button class="btn" onclick="mt()">🔔 Minta dalam aplikasi</button><p id="ms"></p><button class="btn p" onclick="home()">Kembali ke halaman utama</button></div>`);say(t+'. Mahu cuba lagi? Minta Cikgu set semula.');
 }
 function wa(){
   const st=D.set.find(x=>x.i==S);

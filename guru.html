@@ -157,7 +157,7 @@ login();
 
 // ===== Ujian sebutan suara =====
 let UV=[];
-const uPv=()=>UV.find(x=>/^ms/i.test(x.lang))||UV.find(x=>/^id/i.test(x.lang))||null;
+const uPv=()=>UV.find(x=>/^ms[-_]MY$/i.test(x.lang))||UV.find(x=>/^ms/i.test(x.lang))||UV.find(x=>/^id/i.test(x.lang))||null;
 function uIsi(){
   UV=speechSynthesis.getVoices();
   const a=uPv(),sel=$('uv');if(!sel)return;
@@ -165,7 +165,7 @@ function uIsi(){
   const urut=[...UV].sort((x,y)=>(/^(ms|id)/i.test(y.lang)?1:0)-(/^(ms|id)/i.test(x.lang)?1:0));
   sel.innerHTML='<option value="">Sama seperti aplikasi murid</option>'+urut.map(v=>`<option value="${e(v.name)}">${e(v.name)} (${e(v.lang)})</option>`).join('');
   sel.value=cur;
-  $('ui').innerHTML=a?`Suara yang digunakan aplikasi murid pada peranti ini: <b>${e(a.name)} (${e(a.lang)})</b>`:'<b>Tiada suara Melayu atau Indonesia pada peranti ini.</b> Aplikasi menggunakan suara lalai pelayar, jadi sebutan boleh kurang tepat. Pasang suara Melayu dalam tetapan bahasa peranti.';
+  $('ui').innerHTML=a?`Suara yang digunakan aplikasi murid pada peranti ini: <b>${e(a.name)} (${e(a.lang)})</b>`+(/^ms/i.test(a.lang)?'':' <br><small><b>Perhatian:</b> suara Bahasa Melayu (Malaysia) belum dipasang pada peranti ini, jadi suara Indonesia digunakan. Pasang suara Melayu (Malaysia) dalam tetapan bahasa peranti, kemudian muat semula laman.</small>'):'<b>Tiada suara Melayu atau Indonesia pada peranti ini.</b> Aplikasi menggunakan suara lalai pelayar, jadi sebutan boleh kurang tepat. Pasang suara Melayu dalam tetapan bahasa peranti.';
 }
 speechSynthesis.onvoiceschanged=uIsi;
 function ujiDengar(m){

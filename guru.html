@@ -50,6 +50,7 @@ try{cfgApply(JSON.parse(localStorage.getItem('cfg')))}catch(x){}
 let KOD='',R=[],I={},F='',G=[],M=[],BR=[],SO='d';
 const cv=(a,b)=>String(a||'').localeCompare(String(b||''),'ms',{numeric:true});
 const SF={d:()=>0,n:(a,b)=>cv(a.n,b.n),k:(a,b)=>cv(a.k,b.k)||cv(a.n,b.n),s:(a,b)=>cv(a.sub,b.sub)||cv(a.t,b.t)||cv(a.n,b.n)};
+const bc=x=>x.st=='Selesai'||(x.st=='Diulang'&&x.m!=='');
 const pc=x=>x.z?Math.round(x.m/x.z*100):0;
 const av=a=>a.length?Math.round(a.reduce((s,x)=>s+pc(x),0)/a.length):0;
 const grp=(a,f)=>{const o={};a.forEach(x=>(o[f(x)]=o[f(x)]||[]).push(x));return Object.entries(o)};
@@ -81,15 +82,15 @@ function show(){
 }
 function tbl(){
   M=[...BR].sort((a,b)=>SF[SO](a,b)||(b.d||0)-(a.d||0)||cv(a.n+a.t,b.n+b.t));
-  $('rm').innerHTML='<div class="w"><table><tr><th>Tarikh dan Masa</th><th>Nama</th><th>Kelas</th><th>Mata pelajaran</th><th>Set</th><th>Percubaan</th><th>Markah</th><th>%</th><th>Status</th><th></th></tr>'+M.map((x,i)=>`<tr><td>${x.d?fd(x.d):'-'}</td><td>${x.st=='Selesai'?`<a href="#" class="cn" title="Cetak soalan dan jawapan murid" onclick="cetak(${i});return false">🖨 ${e(x.n)}</a>`:e(x.n)}</td><td>${e(x.k)}</td><td>${e(x.sub)}</td><td>${e(x.t)}</td><td>${x.p}</td><td>${x.m!==''?x.m+' / '+x.z:'-'}</td><td>${x.m!==''?pc(x):'-'}</td><td>${e(x.st)}</td><td>${x.st=='Diulang'?'':`<button onclick="rs(${i})">Set semula</button>`+(x.st!='Selesai'?` <button class="dl" onclick="pd(${i})">Padam</button>`:'')}</td></tr>`).join('')+'</table></div>';
+  $('rm').innerHTML='<div class="w"><table><tr><th>Tarikh dan Masa</th><th>Nama</th><th>Kelas</th><th>Mata pelajaran</th><th>Set</th><th>Percubaan</th><th>Markah</th><th>%</th><th>Status</th><th></th></tr>'+M.map((x,i)=>`<tr><td>${x.d?fd(x.d):'-'}</td><td>${bc(x)?`<a href="#" class="cn" title="Cetak soalan dan jawapan murid" onclick="cetak(${i});return false">🖨 ${e(x.n)}</a>`:e(x.n)}</td><td>${e(x.k)}</td><td>${e(x.sub)}</td><td>${e(x.t)}</td><td>${x.p}</td><td>${x.m!==''?x.m+' / '+x.z:'-'}</td><td>${x.m!==''?pc(x):'-'}</td><td>${e(x.st)}</td><td>${x.st=='Diulang'?'':`<button onclick="rs(${i})">Set semula</button>`+(x.st!='Selesai'?` <button class="dl" onclick="pd(${i})">Padam</button>`:'')}</td></tr>`).join('')+'</table></div>';
 }
 
 // Cetak soalan yang telah dijawab oleh seorang murid (hanya rekod berstatus Selesai)
 function cetak(i){
   const x=M[i];
-  if(!x||x.st!='Selesai')return;
+  if(!x||!bc(x))return;
   const q=I[x.sub+'|'+x.t]||[],j=String(x.j||'');
-  if(!q.length){alert('Soalan set ini tidak dapat dimuatkan.');return}
+  if(!q.length){alert('Soalan untuk set "'+x.t+'" ('+x.sub+') tidak ditemui.\n\nSet ini mungkin telah dipadam atau namanya diubah dalam tab Senarai Set, atau Code.gs belum di-deploy versi terbaharu.');return}
   const L='ABCD';
   const body=q.map((s,n)=>{
     const a=j[n]&&L.includes(j[n])?j[n]:'-',ok=a==s.k;
@@ -119,6 +120,7 @@ table.i{border-collapse:collapse;margin-bottom:12px}table.i td{padding:3px 12px 
 <tr><td><b>Nama</b></td><td>${e(x.n)}</td><td><b>Kelas</b></td><td>${e(x.k)}</td></tr>
 <tr><td><b>Mata pelajaran</b></td><td>${e(x.sub)}</td><td><b>Set</b></td><td>${e(x.t)}</td></tr>
 <tr><td><b>Tarikh</b></td><td>${x.d?fd(x.d):'-'}</td><td><b>Markah</b></td><td>${x.m} / ${x.z} (${pc(x)}%)</td></tr>
+<tr><td><b>Status</b></td><td>${e(x.st)}</td><td><b>Percubaan</b></td><td>${x.p}</td></tr>
 </table>${body}</body></html>`);
   w.document.close();
   setTimeout(()=>{w.focus();w.print()},700);

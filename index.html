@@ -129,9 +129,12 @@ const AO={dr:'doktor',prof:'profesor',en:'encik',pn:'puan',tn:'tuan',hj:'haji',h
 const AD={kg:'kampung',jln:'jalan',bhg:'bahagian',no:'nombor'};
 const UN={kg:'kilogram',g:'gram',km:'kilometer',m:'meter',cm:'sentimeter',mm:'milimeter',l:'liter',ml:'mililiter'};
 const SY={'×':' darab ','÷':' bahagi ','=':' sama dengan '};
+// Ejaan sebutan lalai (boleh diatasi melalui tab "Sebutan" dalam Sheet: lajur A perkataan, lajur B cara sebut)
+const DEF={cuba:'chuba',cubalah:'chubalah',mencuba:'menchuba',dicuba:'dichuba',percubaan:'perchubaan'};
 function sb(t){
   t=String(t);
   (D&&D.p||[]).forEach(([a,b])=>{if(a)t=t.replace(new RegExp('(?<![A-Za-z0-9])'+a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![A-Za-z0-9])','gi'),b)});
+  t=t.replace(/(?<![A-Za-z0-9])(cuba|cubalah|mencuba|dicuba|percubaan)(?![A-Za-z0-9])/gi,(a,w)=>DEF[w.toLowerCase()]);
   t=t.replace(/RM\s?(\d[\d,.]*)/g,'$1 ringgit').replace(/(\d)\s?(kg|km|cm|mm|ml|g|m|l)\b/g,(a,d,u)=>d+' '+UN[u]).replace(/%/g,' peratus').replace(/\+/g,' tambah ').replace(/[×÷=]/g,c=>SY[c]).replace(/(\d)\s*x\s*(\d)/gi,'$1 darab $2').replace(/\s[-−]\s/g,' tolak ');
   return t.replace(/\b([A-Za-z]+)(\.?)(?=[\s,;:?!)]|$)/g,(a,w,d)=>{const k=w.toLowerCase();return AO[k]||((d&&AD[k])||a)});
 }

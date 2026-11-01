@@ -111,6 +111,17 @@ let NRI=2;try{const z=localStorage.getItem('nr3');if(z!==null&&+z>=0&&+z<NRL.len
 const nsay=(t,cb)=>{const L=NRL[NRI];say(L[2]?String(t).replace(/\s+/g,', '):t,cb,L[1])};
 function nrTog(){NRI=(NRI+1)%NRL.length;try{localStorage.setItem('nr3',NRI)}catch(x){}auto=false;at++;speechSynthesis.cancel();nv()}
 const nrBtn=()=>`<button class="btn" style="min-height:48px;font-size:.8em;margin:6px 0" onclick="nrTog()">🐢 Kelajuan suara: ${NRL[NRI][0]}</button>`;
+// Pulihkan pecahan yang ditukar menjadi tarikh oleh Google Sheets/Excel (cth. 3/4 -> "Wed Mar 04 2026 ...")
+const BLN={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function fixPec(v){
+  if(typeof v!=='string')return v;
+  let m=v.trim().match(/^(?:[A-Za-z]{3}\s+)?([A-Za-z]{3})\s+(\d{1,2})\s+\d{4}\s+\d{1,2}:\d{2}:\d{2}\s+GMT[+-]\d{4}/);
+  if(m&&BLN[m[1].toLowerCase()])return BLN[m[1].toLowerCase()]+'/'+(+m[2]);
+  m=v.trim().match(/^\d{4}-(\d{2})-(\d{2})T\d{2}:\d{2}:\d{2}/);
+  if(m)return (+m[1])+'/'+(+m[2]);
+  return v;
+}
+function fixQ(a){(a||[]).forEach(q=>{if(q){if(Array.isArray(q.o))q.o=q.o.map(fixPec);q.s=fixPec(q.s)}});return a}
 const api=async q=>(await fetch(API+'?'+new URLSearchParams(q))).json();
 const DL=$('hl').src;let WA='60176308327';
 function cfgApply(c){
@@ -135,6 +146,7 @@ const digit=n=>String(n).replace(/\d|-/g,c=>c=='-'?', ':DGT[+c]+' ').replace(/\s
 const DEF={cuba:'chuba',cubalah:'chubalah',mencuba:'menchuba',dicuba:'dichuba',percubaan:'perchubaan'};
 function sb(t){
   t=String(t);
+  t=t.replace(/(?<![\d/.])(\d{1,2})\/(\d{1,2})(?![\d/])/g,'$1 per $2');
   (D&&D.p||[]).forEach(([a,b])=>{if(a)t=t.replace(new RegExp('(?<![A-Za-z0-9])'+a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![A-Za-z0-9])','gi'),b)});
   t=t.replace(/(?<![A-Za-z0-9])(cuba|cubalah|mencuba|dicuba|percubaan)(?![A-Za-z0-9])/gi,(a,w)=>DEF[w.toLowerCase()]);
   // Nombor kecemasan dan nombor telefon disebut satu digit demi satu digit (999 = sembilan sembilan sembilan)
@@ -216,7 +228,7 @@ async function go(){
   try{
     const r=await api({a:'start',i:S,n:nama,k:kelas});
     if(r.d){dah();return}
-    Q=r.q;const sj=String(r.j||'');J=Q.map((_,i)=>'ABCD'.includes(sj[i]||'x')?sj[i]:'-');mula=r.m;off=r.now-Date.now();dur=r.dur;cur=0;op=new Set();
+    Q=fixQ(r.q);const sj=String(r.j||'');J=Q.map((_,i)=>'ABCD'.includes(sj[i]||'x')?sj[i]:'-');mula=r.m;off=r.now-Date.now();dur=r.dur;cur=0;op=new Set();
     J.forEach((x,i)=>{if(x!='-')op.add(i)});
     timer=setInterval(tick,1000);quiz();
   }catch(x){alert('Tiada sambungan internet. Cuba lagi.');who(S)}

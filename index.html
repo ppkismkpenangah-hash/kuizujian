@@ -172,7 +172,7 @@ async function home(){
     try{D=await api({a:'init'});if(!D.set)throw 0;cfgApply(D.cfg)}
     catch(x){D=null;v('<p>Tidak dapat membaca Sheet. Semak URL Apps Script dan tetapan akses (Anyone).</p>');return}
   }
-  if(D.nota&&D.nota.length){v('<h2>Pilih ruangan</h2><button class="btn" onclick="nota()">📚 Nota</button><button class="btn" onclick="kuiz()">📝 Kuiz / Ujian Bersuara</button>');return}
+  if(D.nota&&D.nota.length){v('<h2>Pilih ruangan</h2><button class="btn" onclick="nota()">📚 Nota</button><button class="btn" onclick="kuiz()">📝 Kuiz / Ujian</button>');return}
   kuiz();
 }
 function kuiz(){
@@ -225,7 +225,7 @@ function sets(i){
 // Set jenis PDF (ujian praktikal kertas): paparan PDF, tiada kuiz dan tiada rekod markah
 function pdfv(i){
   const st=D.set.find(x=>x.i==i)||{},id=encodeURIComponent(st.pdf||''),si=[...new Set(D.set.map(x=>x.sub))].indexOf(sub);
-  v(`<h2>${e(st.t)}</h2><a class="btn p" href="https://drive.google.com/file/d/${id}/view" target="_blank" rel="noopener">📄 Buka PDF</a><a class="btn" href="https://drive.google.com/uc?export=download&id=${id}" target="_blank" rel="noopener">⬇ Simpan / Cetak PDF</a><iframe src="https://drive.google.com/file/d/${id}/preview" title="${e(st.t)}" style="width:100%;height:70vh;border:3px solid var(--n);border-radius:14px;background:#fff"></iframe><button class="btn" onclick="sets(${si})">⬅ Kembali</button>`);
+  v(`<h2>${e(st.t)}</h2><a class="btn p" href="https://drive.google.com/uc?export=download&id=${id}" target="_blank" rel="noopener">⬇ Simpan / Cetak PDF</a><iframe src="https://drive.google.com/file/d/${id}/preview" title="${e(st.t)}" style="width:100%;height:70vh;border:3px solid var(--n);border-radius:14px;background:#fff"></iframe><button class="btn" onclick="sets(${si})">⬅ Kembali</button>`);
   say(st.t);
 }
 function who(i){

@@ -220,12 +220,12 @@ function pa(){
 }
 function sets(i){
   sub=[...new Set(D.set.map(x=>x.sub))][i];
-  v(`<h2>${e(sub)}</h2><p>Pilih set soalan</p>`+D.set.filter(x=>x.sub==sub).map(x=>`<button class="btn" onclick="${x.pdf?'pdfv':'who'}(${x.i})">${x.pdf?'📄':'📝'} ${e(x.t)}${x.f?' (Tingkatan '+e(x.f)+')':''}</button>`).join('')+'<button class="btn" onclick="kuiz()">⬅ Kembali</button>');
+  v(`<h2>${e(sub)}</h2><p>Pilih set soalan</p>`+D.set.filter(x=>x.sub==sub).map(x=>`<button class="btn" onclick="${x.pdf||x.gdoc?'pdfv':'who'}(${x.i})">${x.pdf||x.gdoc?'📄':'📝'} ${e(x.t)}${x.f?' (Tingkatan '+e(x.f)+')':''}</button>`).join('')+'<button class="btn" onclick="kuiz()">⬅ Kembali</button>');
 }
-// Set jenis PDF (ujian praktikal kertas): paparan PDF, tiada kuiz dan tiada rekod markah
+// Set jenis PDF atau Google Docs (ujian praktikal kertas): paparan dokumen, tiada kuiz dan tiada rekod markah
 function pdfv(i){
-  const st=D.set.find(x=>x.i==i)||{},id=encodeURIComponent(st.pdf||''),si=[...new Set(D.set.map(x=>x.sub))].indexOf(sub);
-  v(`<h2>${e(st.t)}</h2><a class="btn p" href="https://drive.google.com/uc?export=download&id=${id}" target="_blank" rel="noopener">⬇ Simpan / Cetak PDF</a><iframe src="https://drive.google.com/file/d/${id}/preview" title="${e(st.t)}" style="width:100%;height:70vh;border:3px solid var(--n);border-radius:14px;background:#fff"></iframe><button class="btn" onclick="sets(${si})">⬅ Kembali</button>`);
+  const st=D.set.find(x=>x.i==i)||{},gd=!!st.gdoc,id=encodeURIComponent(st.gdoc||st.pdf||''),pv=gd?`https://docs.google.com/document/d/${id}/preview`:`https://drive.google.com/file/d/${id}/preview`,dl=gd?`https://docs.google.com/document/d/${id}/export?format=pdf`:`https://drive.google.com/uc?export=download&id=${id}`,si=[...new Set(D.set.map(x=>x.sub))].indexOf(sub);
+  v(`<h2>${e(st.t)}</h2><a class="btn p" href="${dl}" target="_blank" rel="noopener">⬇ Simpan / Cetak PDF</a><iframe src="${pv}" title="${e(st.t)}" style="width:100%;height:70vh;border:3px solid var(--n);border-radius:14px;background:#fff"></iframe><button class="btn" onclick="sets(${si})">⬅ Kembali</button>`);
   say(st.t);
 }
 function who(i){

@@ -200,7 +200,7 @@ async function nopen(i){
 function nv(){
   const k=NK[nc],N=NK.length;
   let h=`<p><b>Kad ${nc+1} daripada ${N}</b></p>`+skBtn('n')+nrBtn();
-  if(k.g)h+=`<img src="${k.g}" alt="">`;
+  [].concat(k.g||[]).filter(Boolean).forEach(s=>{h+=`<img src="${s}" alt="">`});
   h+=`<div class="row"><button class="btn t" onclick="nsay(NK[${nc}].t)">${sk(k.t)}</button><button class="btn c" onclick="nsay(NK[${nc}].t)">🔊</button></div>`;
   h+=`<button class="btn" onclick="na()">${auto?'⏹ Berhenti':'▶ Dengar semua dari sini'}</button>`;
   h+=`<div class="row"><button class="btn t" ${nc?'':'disabled'} onclick="nmv(-1)">⬅ Kembali</button><button class="btn t p" ${nc<N-1?'':'disabled'} onclick="nmv(1)">Seterusnya ➡</button></div><button class="btn" onclick="home()">🏠 Halaman utama</button>`;

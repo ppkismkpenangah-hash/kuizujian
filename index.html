@@ -218,7 +218,7 @@ async function home(){
     catch(x){D=null;v('<p>Tidak dapat membaca Sheet. Semak URL Apps Script dan tetapan akses (Anyone).</p>');return}
   }
   if(D.nota&&D.nota.length){const h=new Date().getHours(),g=h<12?'Selamat pagi':h<14?'Selamat tengah hari':h<19?'Selamat petang':'Selamat malam';
-    v(`<p class="sal">${g}! 👋 ${sp(g+'. Selamat datang ke Ruang Pembelajaran.')}</p><h2>Pilih ruangan ${sp('Pilih ruangan')}</h2><div class="cds">${cd('nota()','📚','Nota','Nota','#1b5e32','#e3f1e6')}${cd('kuiz()','📝','Kuiz / Ujian','Kuiz atau Ujian','#b8860b','#fbf1cf')}</div>`);return}
+    v(`<h2>Pilih ruangan ${sp(g+'. Selamat datang ke Ruang Pembelajaran. Pilih ruangan.')}</h2><div class="cds">${cd('nota()','📚','Nota','Nota','#1b5e32','#e3f1e6')}${cd('kuiz()','📝','Kuiz / Ujian','Kuiz atau Ujian','#b8860b','#fbf1cf')}</div>`);return}
   kuiz();
 }
 function kuiz(){

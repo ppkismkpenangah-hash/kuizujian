@@ -32,6 +32,8 @@ img{display:block;max-width:100%;max-height:260px;margin:10px auto;border-radius
 .g button{min-height:84px;border:3px solid;border-radius:16px;font:inherit;font-weight:700;color:#fff;cursor:pointer}
 .ok{background:var(--ok);border-color:#1f7a3a}.no{background:var(--no);border-color:#a82e2e}
 .btn small{font-weight:400}
+.sp{display:inline-block;margin-left:8px;padding:4px 10px;border-radius:12px;cursor:pointer;font-weight:400;vertical-align:middle;-webkit-tap-highlight-color:transparent}.sp:hover{background:rgba(212,160,23,.25)}.sp:focus-visible{outline:4px solid var(--g);outline-offset:1px}
+.btn.p .sp:hover{background:rgba(255,255,255,.25)}
 .clk{font-size:1.8em;font-weight:700;text-align:center;margin-bottom:6px}
 .end{text-align:center;padding:40px 8px}.end b{font-size:2.4em;display:block}
 @media(max-width:600px){body{font-size:18px}header{padding:12px;gap:12px;font-size:.9em}header img{height:48px}main{padding:12px}.btn{min-height:58px;padding:10px 12px;margin:10px 0;border-radius:16px}.row{gap:8px;margin:10px 0}.row .c{width:64px}select{min-height:54px}img{max-height:200px}.g{grid-template-columns:repeat(auto-fill,minmax(76px,1fr))}.g button{min-height:68px}.clk{font-size:1.5em}.end{padding:24px 4px}}
@@ -162,6 +164,9 @@ function sb(t){
   return t.replace(/\b([A-Za-z]+)(\.?)(?=[\s,;:?!)]|$)/g,(a,w,d)=>{const k=w.toLowerCase();return AO[k]||((d&&AD[k])||a)});
 }
 const say=(t,cb,r)=>{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(sb(t)),s=pv();if(s){u.voice=s;u.lang=s.lang}else u.lang='ms-MY';u.rate=r||.9;if(cb)u.onend=cb;speechSynthesis.speak(u)};
+// Ikon 🔊 pada menu: tekan 🔊 sahaja = dengar (tidak masuk). Tekan bahagian lain butang = masuk.
+const sp=t=>`<span class="sp" role="button" tabindex="0" aria-label="Dengar" data-t="${e(t)}" onclick="spk(event,this)" onkeydown="if(event.key=='Enter'||event.key==' ')spk(event,this)">🔊</span>`;
+function spk(ev,el){ev.stopPropagation();ev.preventDefault();say(el.dataset.t)}
 let NK=[],nc=0,auto=false,at=0;
 let D,sub,S,nama,kelas,Q=[],J=[],op=new Set(),cur=0,mula,off,dur,timer,busy=false,hk='',pg='q';
 
@@ -172,20 +177,20 @@ async function home(){
     try{D=await api({a:'init'});if(!D.set)throw 0;cfgApply(D.cfg)}
     catch(x){D=null;v('<p>Tidak dapat membaca Sheet. Semak URL Apps Script dan tetapan akses (Anyone).</p>');return}
   }
-  if(D.nota&&D.nota.length){v('<h2>Pilih ruangan</h2><button class="btn" onclick="nota()">📚 Nota</button><button class="btn" onclick="kuiz()">📝 Kuiz / Ujian</button>');return}
+  if(D.nota&&D.nota.length){v('<h2>Pilih ruangan '+sp('Pilih ruangan')+'</h2><button class="btn" onclick="nota()">📚 Nota '+sp('Nota')+'</button><button class="btn" onclick="kuiz()">📝 Kuiz / Ujian '+sp('Kuiz atau Ujian')+'</button>');return}
   kuiz();
 }
 function kuiz(){
   const ss=[...new Set(D.set.map(x=>x.sub))];
-  v('<h2>Pilih mata pelajaran</h2>'+ss.map((s,i)=>`<button class="btn" onclick="sets(${i})">📚 ${e(s)}</button>`).join('')+(D.nota&&D.nota.length?'<button class="btn" onclick="home()">⬅ Kembali</button>':''));
+  v('<h2>Pilih mata pelajaran '+sp('Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>`<button class="btn" onclick="sets(${i})">📚 ${e(s)} ${sp(s)}</button>`).join('')+(D.nota&&D.nota.length?'<button class="btn" onclick="home()">⬅ Kembali '+sp('Kembali')+'</button>':''));
 }
 function nota(){
   const ss=[...new Set(D.nota.map(x=>x.sub))];
-  v('<h2>Nota: pilih mata pelajaran</h2>'+ss.map((s,i)=>`<button class="btn" onclick="nsub(${i})">📚 ${e(s)}</button>`).join('')+'<button class="btn" onclick="home()">⬅ Kembali</button>');
+  v('<h2>Nota: pilih mata pelajaran '+sp('Nota. Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>`<button class="btn" onclick="nsub(${i})">📚 ${e(s)} ${sp(s)}</button>`).join('')+'<button class="btn" onclick="home()">⬅ Kembali '+sp('Kembali')+'</button>');
 }
 function nsub(i){
   sub=[...new Set(D.nota.map(x=>x.sub))][i];
-  v(`<h2>${e(sub)}</h2><p>Pilih nota</p>`+D.nota.filter(x=>x.sub==sub).map(x=>`<button class="btn" onclick="nopen(${x.i})">📖 ${e(x.t)}</button>`).join('')+'<button class="btn" onclick="nota()">⬅ Kembali</button>');
+  v(`<h2>${e(sub)} ${sp(sub)}</h2><p>Pilih nota ${sp('Pilih nota')}</p>`+D.nota.filter(x=>x.sub==sub).map(x=>`<button class="btn" onclick="nopen(${x.i})">📖 ${e(x.t)} ${sp(x.t)}</button>`).join('')+'<button class="btn" onclick="nota()">⬅ Kembali '+sp('Kembali')+'</button>');
 }
 async function nopen(i){
   v('Memuatkan nota…');
@@ -220,7 +225,7 @@ function pa(){
 }
 function sets(i){
   sub=[...new Set(D.set.map(x=>x.sub))][i];
-  v(`<h2>${e(sub)}</h2><p>Pilih set soalan</p>`+D.set.filter(x=>x.sub==sub).map(x=>`<button class="btn" onclick="${x.pdf||x.gdoc?'pdfv':'who'}(${x.i})">${x.pdf||x.gdoc?'📄':'📝'} ${e(x.t)}${x.f?' (Tingkatan '+e(x.f)+')':''}</button>`).join('')+'<button class="btn" onclick="kuiz()">⬅ Kembali</button>');
+  v(`<h2>${e(sub)} ${sp(sub)}</h2><p>Pilih set soalan ${sp('Pilih set soalan')}</p>`+D.set.filter(x=>x.sub==sub).map(x=>`<button class="btn" onclick="${x.pdf||x.gdoc?'pdfv':'who'}(${x.i})">${x.pdf||x.gdoc?'📄':'📝'} ${e(x.t)}${x.f?' (Tingkatan '+e(x.f)+')':''} ${sp(x.t+(x.f?' Tingkatan '+x.f:''))}</button>`).join('')+'<button class="btn" onclick="kuiz()">⬅ Kembali '+sp('Kembali')+'</button>');
 }
 // Set jenis PDF atau Google Docs (ujian praktikal kertas): paparan dokumen, tiada kuiz dan tiada rekod markah
 function pdfv(i){

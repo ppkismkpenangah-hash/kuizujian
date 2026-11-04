@@ -46,6 +46,7 @@ img{display:block;max-width:100%;max-height:260px;margin:10px auto;border-radius
 .row.on .c,.cd.on .cs{background:var(--g)!important}
 .cd.on{box-shadow:0 0 0 6px rgba(212,160,23,.55)}
 .sp.on{background:rgba(212,160,23,.5)}
+.mi{display:inline-grid;grid-template-columns:auto auto;gap:1px 3px;font-size:.7em;line-height:1.1;vertical-align:middle}.mi i{font-style:normal}
 @media(max-width:600px){.cm{min-height:140px}.cm .ic{font-size:3em}.cds{gap:10px}}
 @media(prefers-reduced-motion:reduce){.btn,.cm,.cd{transition:none!important}.btn:active,.cm:active{transform:none}}
 .clk{font-size:1.8em;font-weight:700;text-align:center;margin-bottom:6px}
@@ -199,7 +200,7 @@ const subs=a=>[...new Set(a.map(x=>x.sub))].sort((p,q)=>String(p).localeCompare(
 const SC=[
 [/inggeris|english/i,'🔤','#c62828','#fdeaea'],
 [/melayu/i,'🗣️','#3949ab','#e8eaf8'],
-[/matematik/i,'➕','#1f5fa8','#e2edf9'],
+[/matematik/i,'<span class="mi"><i>➕</i><i>➖</i><i>✖️</i><i>➗</i></span>','#1f5fa8','#e2edf9'],
 [/jasmani|kesihatan/i,'🏃','#c2561a','#fdebdc'],
 [/moral/i,'🤝','#ad1457','#fce4ec'],
 [/islam/i,'🕌','#00796b','#dff3ef'],

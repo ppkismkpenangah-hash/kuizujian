@@ -119,6 +119,11 @@ let NRI=2;try{const z=localStorage.getItem('nr3');if(z!==null&&+z>=0&&+z<NRL.len
 const nsay=(t,cb)=>{const L=NRL[NRI];say(L[2]?String(t).replace(/\s+/g,', '):t,cb,L[1])};
 function nrTog(){NRI=(NRI+1)%NRL.length;try{localStorage.setItem('nr3',NRI)}catch(x){}auto=false;at++;speechSynthesis.cancel();nv()}
 const nrBtn=()=>`<button class="btn" style="min-height:48px;font-size:.8em;margin:6px 0" onclick="nrTog()">🐢 Kelajuan suara: ${NRL[NRI][0]}</button>`;
+// Kelajuan suara untuk kuiz (soalan dan pilihan jawapan): senarai sama seperti nota, tetapan berasingan, lalai "Biasa"
+let QRI=0;try{const z=localStorage.getItem('qr1');if(z!==null&&+z>=0&&+z<NRL.length)QRI=+z}catch(x){}
+const qsay=(t,cb)=>{const L=NRL[QRI];say(L[2]?String(t).replace(/\s+/g,', '):t,cb,L[1])};
+function qrTog(){QRI=(QRI+1)%NRL.length;try{localStorage.setItem('qr1',QRI)}catch(x){}speechSynthesis.cancel();quiz()}
+const qrBtn=()=>`<button class="btn" style="min-height:48px;font-size:.8em;margin:6px 0" onclick="qrTog()">🐢 Kelajuan suara: ${NRL[QRI][0]}</button>`;
 // Pulihkan pecahan yang ditukar menjadi tarikh oleh Google Sheets/Excel (cth. 3/4 -> "Wed Mar 04 2026 ...")
 const BLN={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
 function fixPec(v){
@@ -188,7 +193,7 @@ function kuiz(){
 }
 function nota(){
   const ss=[...new Set(D.nota.map(x=>x.sub))];
-  v('<h2>Nota: pilih mata pelajaran '+sp('Nota. Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>mr(`nsub(${i})`,'📚 '+sk(s),s)).join('')+mr('home()','⬅ Kembali','Kembali'));
+  v('<h2>Nota: Pilih mata pelajaran '+sp('Nota. Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>mr(`nsub(${i})`,'📚 '+sk(s),s)).join('')+mr('home()','⬅ Kembali','Kembali'));
 }
 function nsub(i){
   sub=[...new Set(D.nota.map(x=>x.sub))][i];
@@ -255,12 +260,12 @@ async function go(){
 const rem=()=>mula+dur-(Date.now()+off);
 function quiz(){
   op.add(cur);const q=Q[cur],N=Q.length;
-  let h=`<div class="clk" id="clk"></div><div class="bar"><i id="bar"></i></div><p><b>Soalan ${cur+1} daripada ${N}</b></p>`+skBtn('q');
+  let h=`<div class="clk" id="clk"></div><div class="bar"><i id="bar"></i></div><p><b>Soalan ${cur+1} daripada ${N}</b></p>`+skBtn('q')+qrBtn();
   if(q.g)h+=`<img src="${q.g}" alt="">`;
-  h+=`<div class="row"><button class="btn t" onclick="say(Q[${cur}].s)">${sk(q.s)}</button><button class="btn c" onclick="say(Q[${cur}].s)">🔊</button></div>`;
+  h+=`<div class="row"><button class="btn t" onclick="qsay(Q[${cur}].s)">${sk(q.s)}</button><button class="btn c" onclick="qsay(Q[${cur}].s)">🔊</button></div>`;
   'ABCD'.split('').forEach((L,k)=>{
     if(q.o[k]==='')return;const s=J[cur]==L;
-    h+=`<div class="row"><button class="btn t ${s?'sel':''}" onclick="say('${L}. '+Q[${cur}].o[${k}])">${L}. ${sk(q.o[k])} 🔊</button><button class="btn c ${s?'sel':''}" aria-label="Pilih ${L}" onclick="pick('${L}')">${s?'✔':'○'}</button></div>`});
+    h+=`<div class="row"><button class="btn t ${s?'sel':''}" onclick="qsay('${L}. '+Q[${cur}].o[${k}])">${L}. ${sk(q.o[k])} 🔊</button><button class="btn c ${s?'sel':''}" aria-label="Pilih ${L}" onclick="pick('${L}')">${s?'✔':'○'}</button></div>`});
   h+=`<div class="row"><button class="btn t" ${cur?'':'disabled'} onclick="mv(-1)">⬅ Kembali</button>${J.every(x=>x!='-')?'<button class="btn t p" onclick="ask()">📤 Hantar</button>':`<button class="btn t p" ${cur<N-1?'':'disabled'} onclick="mv(1)">Seterusnya ➡</button>`}</div>`;
   if(op.size==N)h+='<button class="btn" onclick="list()">📋 Senarai Soalan</button>';
   pg='q';v(h+'<div id="hz"></div>');hk='';tick();

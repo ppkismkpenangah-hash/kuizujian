@@ -193,6 +193,8 @@ function spk(ev,el){
   const off=()=>{if(my==SPT)T.classList.remove('on')};
   say(t,off);setTimeout(off,Math.max(2500,t.length*110+2000));
 }
+// Senarai mata pelajaran tanpa pendua, disusun ikut abjad (digunakan di semua skrin supaya nombor indeks sentiasa sepadan)
+const subs=a=>[...new Set(a.map(x=>x.sub))].sort((p,q)=>String(p).localeCompare(String(q),'ms',{sensitivity:'base'}));
 // Warna dan ikon ikut mata pelajaran (padanan kata kunci pada nama)
 const SC=[
 [/inggeris|english/i,'🔤','#c62828','#fdeaea'],
@@ -231,15 +233,15 @@ async function home(){
   kuiz();
 }
 function kuiz(){
-  const ss=[...new Set(D.set.map(x=>x.sub))];
+  const ss=subs(D.set);
   v('<h2>Pilih mata pelajaran '+sp('Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>mr(`sets(${i})`,cl(s).i+' '+sk(s),s,s)).join('')+(D.nota&&D.nota.length?mr('home()','⬅ Kembali','Kembali'):''));
 }
 function nota(){
-  const ss=[...new Set(D.nota.map(x=>x.sub))];
+  const ss=subs(D.nota);
   v('<h2>Nota: Pilih mata pelajaran '+sp('Nota. Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>mr(`nsub(${i})`,cl(s).i+' '+sk(s),s,s)).join('')+mr('home()','⬅ Kembali','Kembali'));
 }
 function nsub(i){
-  sub=[...new Set(D.nota.map(x=>x.sub))][i];
+  sub=subs(D.nota)[i];
   v(`<h2>${cl(sub).i} ${e(sub)} ${sp(sub)}</h2><p>Pilih nota ${sp('Pilih nota')}</p>`+D.nota.filter(x=>x.sub==sub).map(x=>mr(`nopen(${x.i})`,'📖 '+sk(x.t)+nDone(x.i),x.t,sub)).join('')+mr('nota()','⬅ Kembali','Kembali'));
 }
 async function nopen(i){
@@ -275,18 +277,18 @@ function pa(){
   });
 }
 function sets(i){
-  sub=[...new Set(D.set.map(x=>x.sub))][i];
+  sub=subs(D.set)[i];
   v(`<h2>${cl(sub).i} ${e(sub)} ${sp(sub)}</h2><p>Pilih set soalan ${sp('Pilih set soalan')}</p>`+D.set.filter(x=>x.sub==sub).map(x=>mr(`${x.pdf||x.gdoc?'pdfv':'who'}(${x.i})`,(x.pdf||x.gdoc?'📄 ':'📝 ')+sk(x.t+(x.f?' (Tingkatan '+x.f+')':''))+(x.pdf||x.gdoc?'':sDone(x.i)),x.t+(x.f?' Tingkatan '+x.f:''),sub)).join('')+mr('kuiz()','⬅ Kembali','Kembali'));
 }
 // Set jenis PDF atau Google Docs (ujian praktikal kertas): paparan dokumen, tiada kuiz dan tiada rekod markah
 function pdfv(i){
-  const st=D.set.find(x=>x.i==i)||{},gd=!!st.gdoc,id=encodeURIComponent(st.gdoc||st.pdf||''),pv=gd?`https://docs.google.com/document/d/${id}/preview`:`https://drive.google.com/file/d/${id}/preview`,dl=gd?`https://docs.google.com/document/d/${id}/export?format=pdf`:`https://drive.google.com/uc?export=download&id=${id}`,si=[...new Set(D.set.map(x=>x.sub))].indexOf(sub);
+  const st=D.set.find(x=>x.i==i)||{},gd=!!st.gdoc,id=encodeURIComponent(st.gdoc||st.pdf||''),pv=gd?`https://docs.google.com/document/d/${id}/preview`:`https://drive.google.com/file/d/${id}/preview`,dl=gd?`https://docs.google.com/document/d/${id}/export?format=pdf`:`https://drive.google.com/uc?export=download&id=${id}`,si=subs(D.set).indexOf(sub);
   v(`<h2>${e(st.t)}</h2><a class="btn p" href="${dl}" target="_blank" rel="noopener">⬇ Simpan / Cetak PDF</a><iframe src="${pv}" title="${e(st.t)}" style="width:100%;height:70vh;border:3px solid var(--n);border-radius:14px;background:#fff"></iframe><button class="btn" onclick="sets(${si})">⬅ Kembali</button>`);
   say(st.t);
 }
 function who(i){
   S=i;const ns=[...new Set(D.m.map(x=>x.n))].sort();
-  v(`<h2>Pilih nama dan kelas</h2><select id="n" onchange="nm()"><option value="">Pilih nama</option>${ns.map(n=>`<option>${e(n)}</option>`).join('')}</select><select id="k"><option value="">Pilih kelas</option></select><button class="btn p" onclick="go()">Teruskan ➡</button><button class="btn" onclick="sets(${[...new Set(D.set.map(x=>x.sub))].indexOf(sub)})">⬅ Kembali</button>`);
+  v(`<h2>Pilih nama dan kelas</h2><select id="n" onchange="nm()"><option value="">Pilih nama</option>${ns.map(n=>`<option>${e(n)}</option>`).join('')}</select><select id="k"><option value="">Pilih kelas</option></select><button class="btn p" onclick="go()">Teruskan ➡</button><button class="btn" onclick="sets(${subs(D.set).indexOf(sub)})">⬅ Kembali</button>`);
 }
 function nm(){const ks=[...new Set(D.m.filter(x=>x.n==$('n').value).map(x=>x.k))];$('k').innerHTML=(ks.length==1?'':'<option value="">Pilih kelas</option>')+ks.map(k=>`<option>${e(k)}</option>`).join('')}
 async function go(){

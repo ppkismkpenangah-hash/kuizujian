@@ -34,6 +34,21 @@ img{display:block;max-width:100%;max-height:260px;margin:10px auto;border-radius
 .btn small{font-weight:400}
 .sp{display:inline-block;margin-left:8px;padding:4px 10px;border-radius:12px;cursor:pointer;font-weight:400;vertical-align:middle;-webkit-tap-highlight-color:transparent}.sp:hover{background:rgba(212,160,23,.25)}.sp:focus-visible{outline:4px solid var(--g);outline-offset:1px}
 .btn.p .sp:hover{background:rgba(255,255,255,.25)}
+.sal{font-size:1.2em;font-weight:700;margin:14px 0 0}
+.row.k .t{border-color:var(--c);border-left-width:14px;background:var(--t)}.row.k .c{border-color:var(--c)}
+.cds{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.cd{display:flex;flex-direction:column;border:3px solid var(--c);border-radius:22px;background:var(--t);overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .2s}
+.cm{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:170px;border:0;background:none;font:inherit;font-weight:700;color:var(--c);padding:20px 10px 12px;cursor:pointer;text-align:center}
+.cm .ic{font-size:3.6em;line-height:1}
+.cs{border:0;border-top:3px solid var(--c);background:#fff;font:inherit;font-size:1.5em;padding:10px;cursor:pointer}
+.btn:active,.cm:active{transform:scale(.985)}
+.btn,.cm{transition:transform .12s,background .2s}
+.row.on .btn{background:#fff2b8!important;border-color:var(--g)!important}
+.row.on .c,.cd.on .cs{background:var(--g)!important}
+.cd.on{box-shadow:0 0 0 6px rgba(212,160,23,.55)}
+.sp.on{background:rgba(212,160,23,.5)}
+@media(max-width:600px){.cm{min-height:140px}.cm .ic{font-size:3em}.cds{gap:10px}}
+@media(prefers-reduced-motion:reduce){.btn,.cm,.cd{transition:none!important}.btn:active,.cm:active{transform:none}}
 .clk{font-size:1.8em;font-weight:700;text-align:center;margin-bottom:6px}
 .end{text-align:center;padding:40px 8px}.end b{font-size:2.4em;display:block}
 @media(max-width:600px){body{font-size:18px}header{padding:12px;gap:12px;font-size:.9em}header img{height:48px}main{padding:12px}.btn{min-height:58px;padding:10px 12px;margin:10px 0;border-radius:16px}.row{gap:8px;margin:10px 0}.row .c{width:64px}select{min-height:54px}img{max-height:200px}.g{grid-template-columns:repeat(auto-fill,minmax(76px,1fr))}.g button{min-height:68px}.clk{font-size:1.5em}.end{padding:24px 4px}}
@@ -171,9 +186,27 @@ function sb(t){
 const say=(t,cb,r)=>{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(sb(t)),s=pv();if(s){u.voice=s;u.lang=s.lang}else u.lang='ms-MY';u.rate=r||.9;if(cb)u.onend=cb;speechSynthesis.speak(u)};
 // Ikon 🔊 pada menu: tekan 🔊 sahaja = dengar (tidak masuk). Tekan bahagian lain butang = masuk.
 const sp=t=>`<span class="sp" role="button" tabindex="0" aria-label="Dengar" data-t="${e(t)}" onclick="spk(event,this)" onkeydown="if(event.key=='Enter'||event.key==' ')spk(event,this)">🔊</span>`;
-function spk(ev,el){ev.stopPropagation();ev.preventDefault();say(el.dataset.t)}
+let SPT=0;
+function spk(ev,el){
+  ev.stopPropagation();ev.preventDefault();
+  const T=el.closest('.row,.cd')||el,t=el.dataset.t,my=++SPT;
+  document.querySelectorAll('.on').forEach(x=>x.classList.remove('on'));T.classList.add('on');
+  const off=()=>{if(my==SPT)T.classList.remove('on')};
+  say(t,off);setTimeout(off,Math.max(2500,t.length*110+2000));
+}
+// Warna dan ikon ikut mata pelajaran (padanan kata kunci pada nama)
+const SC=[[/reflek/i,'🦶','#1b5e32','#e3f1e6'],[/seni|visual/i,'🎨','#6a3d9a','#efe6f8'],[/jasmani|kesihatan/i,'🏃','#c2561a','#fdebdc'],[/matematik/i,'➕','#1f5fa8','#e2edf9']];
+const cl=s=>{const m=SC.find(x=>x[0].test(s));return m?{i:m[1],c:m[2],t:m[3]}:{i:'📚',c:'#1b5e32',t:'#e9f2e4'}};
+// Kemajuan pada peranti ini: ✔ nota yang sudah dibuka, ⭐ set yang sudah siap (murid terakhir yang menyiapkan set pada peranti ini)
+const ld=(k,d)=>{try{const z=JSON.parse(localStorage.getItem(k));return z==null?d:z}catch(x){return d}};
+const sv=(k,z)=>{try{localStorage.setItem(k,JSON.stringify(z))}catch(x){}};
+const nDone=i=>ld('nd',[]).includes(i)?' ✔':'';
+const sDone=i=>((ld('sd',{})[ld('ln','')])||[]).includes(i)?' ⭐':'';
+function mk(){if(!nama||S===undefined)return;const m=ld('sd',{});m[nama]=[...new Set((m[nama]||[]).concat(S))];sv('sd',m);sv('ln',nama)}
+// Kad besar untuk skrin ruangan
+const cd=(oc,ic,nm,t,c,bg)=>`<div class="cd" style="--c:${c};--t:${bg}"><button class="cm" onclick="${oc}"><span class="ic">${ic}</span><span>${sk(nm)}</span></button><button class="cs" aria-label="Dengar ${e(t)}" data-t="${e(t)}" onclick="spk(event,this)">🔊</button></div>`;
 // Baris menu: butang pilihan di kiri, kotak 🔊 berasingan di kanan (sama seperti soalan kuiz)
-const mr=(oc,lb,t)=>`<div class="row"><button class="btn t" onclick="${oc}">${lb}</button><button class="btn c" aria-label="Dengar ${e(t)}" data-t="${e(t)}" onclick="spk(event,this)">🔊</button></div>`;
+const mr=(oc,lb,t,k)=>`<div class="row${k?' k':''}"${k?` style="--c:${cl(k).c};--t:${cl(k).t}"`:''}><button class="btn t" onclick="${oc}">${lb}</button><button class="btn c" aria-label="Dengar ${e(t)}" data-t="${e(t)}" onclick="spk(event,this)">🔊</button></div>`;
 let NK=[],nc=0,auto=false,at=0;
 let D,sub,S,nama,kelas,Q=[],J=[],op=new Set(),cur=0,mula,off,dur,timer,busy=false,hk='',pg='q';
 
@@ -184,22 +217,24 @@ async function home(){
     try{D=await api({a:'init'});if(!D.set)throw 0;cfgApply(D.cfg)}
     catch(x){D=null;v('<p>Tidak dapat membaca Sheet. Semak URL Apps Script dan tetapan akses (Anyone).</p>');return}
   }
-  if(D.nota&&D.nota.length){v('<h2>Pilih ruangan '+sp('Pilih ruangan')+'</h2>'+mr('nota()','📚 '+sk('Nota'),'Nota')+mr('kuiz()','📝 '+sk('Kuiz / Ujian'),'Kuiz atau Ujian'));return}
+  if(D.nota&&D.nota.length){const h=new Date().getHours(),g=h<12?'Selamat pagi':h<14?'Selamat tengah hari':h<19?'Selamat petang':'Selamat malam';
+    v(`<p class="sal">${g}! 👋 ${sp(g+'. Selamat datang ke Ruang Pembelajaran.')}</p><h2>Pilih ruangan ${sp('Pilih ruangan')}</h2><div class="cds">${cd('nota()','📚','Nota','Nota','#1b5e32','#e3f1e6')}${cd('kuiz()','📝','Kuiz / Ujian','Kuiz atau Ujian','#b8860b','#fbf1cf')}</div>`);return}
   kuiz();
 }
 function kuiz(){
   const ss=[...new Set(D.set.map(x=>x.sub))];
-  v('<h2>Pilih mata pelajaran '+sp('Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>mr(`sets(${i})`,'📚 '+sk(s),s)).join('')+(D.nota&&D.nota.length?mr('home()','⬅ Kembali','Kembali'):''));
+  v('<h2>Pilih mata pelajaran '+sp('Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>mr(`sets(${i})`,cl(s).i+' '+sk(s),s,s)).join('')+(D.nota&&D.nota.length?mr('home()','⬅ Kembali','Kembali'):''));
 }
 function nota(){
   const ss=[...new Set(D.nota.map(x=>x.sub))];
-  v('<h2>Nota: Pilih mata pelajaran '+sp('Nota. Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>mr(`nsub(${i})`,'📚 '+sk(s),s)).join('')+mr('home()','⬅ Kembali','Kembali'));
+  v('<h2>Nota: Pilih mata pelajaran '+sp('Nota. Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>mr(`nsub(${i})`,cl(s).i+' '+sk(s),s,s)).join('')+mr('home()','⬅ Kembali','Kembali'));
 }
 function nsub(i){
   sub=[...new Set(D.nota.map(x=>x.sub))][i];
-  v(`<h2>${e(sub)} ${sp(sub)}</h2><p>Pilih nota ${sp('Pilih nota')}</p>`+D.nota.filter(x=>x.sub==sub).map(x=>mr(`nopen(${x.i})`,'📖 '+sk(x.t),x.t)).join('')+mr('nota()','⬅ Kembali','Kembali'));
+  v(`<h2>${cl(sub).i} ${e(sub)} ${sp(sub)}</h2><p>Pilih nota ${sp('Pilih nota')}</p>`+D.nota.filter(x=>x.sub==sub).map(x=>mr(`nopen(${x.i})`,'📖 '+sk(x.t)+nDone(x.i),x.t,sub)).join('')+mr('nota()','⬅ Kembali','Kembali'));
 }
 async function nopen(i){
+  {const nd=ld('nd',[]);if(!nd.includes(i)){nd.push(i);sv('nd',nd)}}
   v('Memuatkan nota…');
   try{
     const r=await api({a:'nota',i});
@@ -232,7 +267,7 @@ function pa(){
 }
 function sets(i){
   sub=[...new Set(D.set.map(x=>x.sub))][i];
-  v(`<h2>${e(sub)} ${sp(sub)}</h2><p>Pilih set soalan ${sp('Pilih set soalan')}</p>`+D.set.filter(x=>x.sub==sub).map(x=>mr(`${x.pdf||x.gdoc?'pdfv':'who'}(${x.i})`,(x.pdf||x.gdoc?'📄 ':'📝 ')+sk(x.t+(x.f?' (Tingkatan '+x.f+')':'')),x.t+(x.f?' Tingkatan '+x.f:''))).join('')+mr('kuiz()','⬅ Kembali','Kembali'));
+  v(`<h2>${cl(sub).i} ${e(sub)} ${sp(sub)}</h2><p>Pilih set soalan ${sp('Pilih set soalan')}</p>`+D.set.filter(x=>x.sub==sub).map(x=>mr(`${x.pdf||x.gdoc?'pdfv':'who'}(${x.i})`,(x.pdf||x.gdoc?'📄 ':'📝 ')+sk(x.t+(x.f?' (Tingkatan '+x.f+')':''))+(x.pdf||x.gdoc?'':sDone(x.i)),x.t+(x.f?' Tingkatan '+x.f:''),sub)).join('')+mr('kuiz()','⬅ Kembali','Kembali'));
 }
 // Set jenis PDF atau Google Docs (ujian praktikal kertas): paparan dokumen, tiada kuiz dan tiada rekod markah
 function pdfv(i){
@@ -306,7 +341,7 @@ function slip(r){
 <table class="qt"><tr><th>No</th><th>Soalan</th><th>Jawapan murid</th><th>Jawapan betul</th><th></th></tr>${Q.map((q,i)=>{const a=J[i],k=r.k[i],ok=a==k;return `<tr class="${ok?'b':'s'}"><td>${i+1}</td><td>${e(q.s)}</td><td>${e(oi(a,q))}</td><td>${e(oi(k,q))}</td><td>${ok?'✔':'✘'}</td></tr>`}).join('')}</table></div>`;
 }
 function rev(r){
-  clearInterval(timer);busy=false;RV=[];
+  clearInterval(timer);busy=false;RV=[];mk();
   const m=r.m,z=r.z,pr=z?m/z*100:0,st=pr>=80?3:pr>=50?2:1,oi=(c,q)=>'ABCD'.includes(c)?q.o['ABCD'.indexOf(c)]:'';
   let h=`<div class="end"><b>${'⭐'.repeat(st)}</b><h2>Markah anda: ${m} / ${z}</h2><p>${st==3?'Syabas! Teruskan usaha.':'Lihat soalan yang salah, dan cuba lagi nanti.'}</p><button class="btn" onclick="say('Markah anda ${m} daripada ${z}')">🔊 Dengar markah</button><button class="btn" onclick="print()">🖨 Cetak</button></div>`;
   Q.forEach((q,i)=>{
@@ -317,7 +352,7 @@ function rev(r){
   v(h+'<button class="btn p" onclick="home()">Kembali ke halaman utama</button>'+slip(r));say('Markah anda '+m+' daripada '+z);
 }
 function dah(){
-  clearInterval(timer);busy=false;const t='Set soalan ini sudah dijawab';
+  clearInterval(timer);busy=false;mk();const t='Set soalan ini sudah dijawab';
   v(`<div class="end"><b>🌟</b><h2>${t}</h2><p>Mahu cuba lagi? Minta Cikgu set semula.</p><button class="btn" onclick="wa()">💬 Minta melalui WhatsApp</button><button class="btn" onclick="mt()">🔔 Minta dalam aplikasi</button><p id="ms"></p><button class="btn p" onclick="home()">Kembali ke halaman utama</button></div>`);say(t+'. Mahu cuba lagi? Minta Cikgu set semula.');
 }
 function wa(){
@@ -330,7 +365,7 @@ async function mt(){
   catch(x){$('ms').textContent='Tiada sambungan internet. Cuba lagi.'}
 }
 function fin(t){
-  clearInterval(timer);busy=false;
+  clearInterval(timer);busy=false;mk();
   v(`<div class="end"><b>🌟</b><h2>${e(t)}</h2><button class="btn p" onclick="home()">Kembali ke halaman utama</button></div>`);say(t);
 }
 home();

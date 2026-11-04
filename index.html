@@ -167,6 +167,8 @@ const say=(t,cb,r)=>{speechSynthesis.cancel();const u=new SpeechSynthesisUtteran
 // Ikon 🔊 pada menu: tekan 🔊 sahaja = dengar (tidak masuk). Tekan bahagian lain butang = masuk.
 const sp=t=>`<span class="sp" role="button" tabindex="0" aria-label="Dengar" data-t="${e(t)}" onclick="spk(event,this)" onkeydown="if(event.key=='Enter'||event.key==' ')spk(event,this)">🔊</span>`;
 function spk(ev,el){ev.stopPropagation();ev.preventDefault();say(el.dataset.t)}
+// Baris menu: butang pilihan di kiri, kotak 🔊 berasingan di kanan (sama seperti soalan kuiz)
+const mr=(oc,lb,t)=>`<div class="row"><button class="btn t" onclick="${oc}">${lb}</button><button class="btn c" aria-label="Dengar ${e(t)}" data-t="${e(t)}" onclick="spk(event,this)">🔊</button></div>`;
 let NK=[],nc=0,auto=false,at=0;
 let D,sub,S,nama,kelas,Q=[],J=[],op=new Set(),cur=0,mula,off,dur,timer,busy=false,hk='',pg='q';
 
@@ -177,20 +179,20 @@ async function home(){
     try{D=await api({a:'init'});if(!D.set)throw 0;cfgApply(D.cfg)}
     catch(x){D=null;v('<p>Tidak dapat membaca Sheet. Semak URL Apps Script dan tetapan akses (Anyone).</p>');return}
   }
-  if(D.nota&&D.nota.length){v('<h2>Pilih ruangan '+sp('Pilih ruangan')+'</h2><button class="btn" onclick="nota()">📚 Nota '+sp('Nota')+'</button><button class="btn" onclick="kuiz()">📝 Kuiz / Ujian '+sp('Kuiz atau Ujian')+'</button>');return}
+  if(D.nota&&D.nota.length){v('<h2>Pilih ruangan '+sp('Pilih ruangan')+'</h2>'+mr('nota()','📚 '+sk('Nota'),'Nota')+mr('kuiz()','📝 '+sk('Kuiz / Ujian'),'Kuiz atau Ujian'));return}
   kuiz();
 }
 function kuiz(){
   const ss=[...new Set(D.set.map(x=>x.sub))];
-  v('<h2>Pilih mata pelajaran '+sp('Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>`<button class="btn" onclick="sets(${i})">📚 ${e(s)} ${sp(s)}</button>`).join('')+(D.nota&&D.nota.length?'<button class="btn" onclick="home()">⬅ Kembali '+sp('Kembali')+'</button>':''));
+  v('<h2>Pilih mata pelajaran '+sp('Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>mr(`sets(${i})`,'📚 '+sk(s),s)).join('')+(D.nota&&D.nota.length?mr('home()','⬅ Kembali','Kembali'):''));
 }
 function nota(){
   const ss=[...new Set(D.nota.map(x=>x.sub))];
-  v('<h2>Nota: pilih mata pelajaran '+sp('Nota. Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>`<button class="btn" onclick="nsub(${i})">📚 ${e(s)} ${sp(s)}</button>`).join('')+'<button class="btn" onclick="home()">⬅ Kembali '+sp('Kembali')+'</button>');
+  v('<h2>Nota: pilih mata pelajaran '+sp('Nota. Pilih mata pelajaran')+'</h2>'+ss.map((s,i)=>mr(`nsub(${i})`,'📚 '+sk(s),s)).join('')+mr('home()','⬅ Kembali','Kembali'));
 }
 function nsub(i){
   sub=[...new Set(D.nota.map(x=>x.sub))][i];
-  v(`<h2>${e(sub)} ${sp(sub)}</h2><p>Pilih nota ${sp('Pilih nota')}</p>`+D.nota.filter(x=>x.sub==sub).map(x=>`<button class="btn" onclick="nopen(${x.i})">📖 ${e(x.t)} ${sp(x.t)}</button>`).join('')+'<button class="btn" onclick="nota()">⬅ Kembali '+sp('Kembali')+'</button>');
+  v(`<h2>${e(sub)} ${sp(sub)}</h2><p>Pilih nota ${sp('Pilih nota')}</p>`+D.nota.filter(x=>x.sub==sub).map(x=>mr(`nopen(${x.i})`,'📖 '+sk(x.t),x.t)).join('')+mr('nota()','⬅ Kembali','Kembali'));
 }
 async function nopen(i){
   v('Memuatkan nota…');
@@ -225,7 +227,7 @@ function pa(){
 }
 function sets(i){
   sub=[...new Set(D.set.map(x=>x.sub))][i];
-  v(`<h2>${e(sub)} ${sp(sub)}</h2><p>Pilih set soalan ${sp('Pilih set soalan')}</p>`+D.set.filter(x=>x.sub==sub).map(x=>`<button class="btn" onclick="${x.pdf||x.gdoc?'pdfv':'who'}(${x.i})">${x.pdf||x.gdoc?'📄':'📝'} ${e(x.t)}${x.f?' (Tingkatan '+e(x.f)+')':''} ${sp(x.t+(x.f?' Tingkatan '+x.f:''))}</button>`).join('')+'<button class="btn" onclick="kuiz()">⬅ Kembali '+sp('Kembali')+'</button>');
+  v(`<h2>${e(sub)} ${sp(sub)}</h2><p>Pilih set soalan ${sp('Pilih set soalan')}</p>`+D.set.filter(x=>x.sub==sub).map(x=>mr(`${x.pdf||x.gdoc?'pdfv':'who'}(${x.i})`,(x.pdf||x.gdoc?'📄 ':'📝 ')+sk(x.t+(x.f?' (Tingkatan '+x.f+')':'')),x.t+(x.f?' Tingkatan '+x.f:''))).join('')+mr('kuiz()','⬅ Kembali','Kembali'));
 }
 // Set jenis PDF atau Google Docs (ujian praktikal kertas): paparan dokumen, tiada kuiz dan tiada rekod markah
 function pdfv(i){

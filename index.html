@@ -242,7 +242,7 @@ function nota(){
 }
 function nsub(i){
   sub=subs(D.nota)[i];
-  v(`<h2>${cl(sub).i} ${e(sub)} ${sp(sub)}</h2><p>Pilih Nota: ${sp('Pilih nota')}</p>`+D.nota.filter(x=>x.sub==sub).map(x=>mr(`nopen(${x.i})`,'📖 '+sk(x.t)+nDone(x.i),x.t,sub)).join('')+mr('nota()','⬅ Kembali','Kembali'));
+  v(`<p>Pilih Nota: ${sp('Pilih nota')}</p>`+D.nota.filter(x=>x.sub==sub).map(x=>mr(`nopen(${x.i})`,'📖 '+sk(x.t)+nDone(x.i),x.t,sub)).join('')+mr('nota()','⬅ Kembali','Kembali'));
 }
 async function nopen(i){
   {const nd=ld('nd',[]);if(!nd.includes(i)){nd.push(i);sv('nd',nd)}}
@@ -278,7 +278,7 @@ function pa(){
 }
 function sets(i){
   sub=subs(D.set)[i];
-  v(`<h2>${cl(sub).i} ${e(sub)} ${sp(sub)}</h2><p>Pilih Set Soalan: ${sp('Pilih set soalan')}</p>`+D.set.filter(x=>x.sub==sub).map(x=>mr(`${x.pdf||x.gdoc?'pdfv':'who'}(${x.i})`,(x.pdf||x.gdoc?'📄 ':'📝 ')+sk(x.t+(x.f?' (Tingkatan '+x.f+')':''))+(x.pdf||x.gdoc?'':sDone(x.i)),x.t+(x.f?' Tingkatan '+x.f:''),sub)).join('')+mr('kuiz()','⬅ Kembali','Kembali'));
+  v(`<p>Pilih Set Soalan: ${sp('Pilih set soalan')}</p>`+D.set.filter(x=>x.sub==sub).map(x=>mr(`${x.pdf||x.gdoc?'pdfv':'who'}(${x.i})`,(x.pdf||x.gdoc?'📄 ':'📝 ')+sk(x.t+(x.f?' (Tingkatan '+x.f+')':''))+(x.pdf||x.gdoc?'':sDone(x.i)),x.t+(x.f?' Tingkatan '+x.f:''),sub)).join('')+mr('kuiz()','⬅ Kembali','Kembali'));
 }
 // Set jenis PDF atau Google Docs (ujian praktikal kertas): paparan dokumen, tiada kuiz dan tiada rekod markah
 function pdfv(i){

@@ -34,7 +34,6 @@ img{display:block;max-width:100%;max-height:260px;margin:10px auto;border-radius
 .btn small{font-weight:400}
 .sp{display:inline-block;margin-left:8px;padding:4px 10px;border-radius:12px;cursor:pointer;font-weight:400;vertical-align:middle;-webkit-tap-highlight-color:transparent}.sp:hover{background:rgba(212,160,23,.25)}.sp:focus-visible{outline:4px solid var(--g);outline-offset:1px}
 .btn.p .sp:hover{background:rgba(255,255,255,.25)}
-.sal{font-size:1.2em;font-weight:700;margin:14px 0 0}
 .row.k .t{border-color:var(--c);border-left-width:14px;background:var(--t)}.row.k .c{border-color:var(--c)}
 .cds{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
 .cd{display:flex;flex-direction:column;border:3px solid var(--c);border-radius:22px;background:var(--t);overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:box-shadow .2s}
@@ -195,7 +194,18 @@ function spk(ev,el){
   say(t,off);setTimeout(off,Math.max(2500,t.length*110+2000));
 }
 // Warna dan ikon ikut mata pelajaran (padanan kata kunci pada nama)
-const SC=[[/reflek/i,'🦶','#1b5e32','#e3f1e6'],[/seni|visual/i,'🎨','#6a3d9a','#efe6f8'],[/jasmani|kesihatan/i,'🏃','#c2561a','#fdebdc'],[/matematik/i,'➕','#1f5fa8','#e2edf9']];
+const SC=[
+[/inggeris|english/i,'🔤','#c62828','#fdeaea'],
+[/melayu/i,'🗣️','#3949ab','#e8eaf8'],
+[/matematik/i,'➕','#1f5fa8','#e2edf9'],
+[/jasmani|kesihatan/i,'🏃','#c2561a','#fdebdc'],
+[/moral/i,'🤝','#ad1457','#fce4ec'],
+[/islam/i,'🕌','#00796b','#dff3ef'],
+[/seni|visual/i,'🎨','#6a3d9a','#efe6f8'],
+[/reflek|urutan/i,'🦶','#1b5e32','#e3f1e6'],
+[/pengurusan/i,'🧼','#7b8a00','#f3f5d6'],
+[/sains|sosial|alam sekitar/i,'🌍','#00838f','#e0f4f7'],
+[/sejarah/i,'🏛️','#6d4c41','#efe6e1']];
 const cl=s=>{const m=SC.find(x=>x[0].test(s));return m?{i:m[1],c:m[2],t:m[3]}:{i:'📚',c:'#1b5e32',t:'#e9f2e4'}};
 // Kemajuan pada peranti ini: ✔ nota yang sudah dibuka, ⭐ set yang sudah siap (murid terakhir yang menyiapkan set pada peranti ini)
 const ld=(k,d)=>{try{const z=JSON.parse(localStorage.getItem(k));return z==null?d:z}catch(x){return d}};
@@ -217,8 +227,7 @@ async function home(){
     try{D=await api({a:'init'});if(!D.set)throw 0;cfgApply(D.cfg)}
     catch(x){D=null;v('<p>Tidak dapat membaca Sheet. Semak URL Apps Script dan tetapan akses (Anyone).</p>');return}
   }
-  if(D.nota&&D.nota.length){const h=new Date().getHours(),g=h<12?'Selamat pagi':h<14?'Selamat tengah hari':h<19?'Selamat petang':'Selamat malam';
-    v(`<h2>Pilih ruangan ${sp(g+'. Selamat datang ke Ruang Pembelajaran. Pilih ruangan.')}</h2><div class="cds">${cd('nota()','📚','Nota','Nota','#1b5e32','#e3f1e6')}${cd('kuiz()','📝','Kuiz / Ujian','Kuiz atau Ujian','#b8860b','#fbf1cf')}</div>`);return}
+  if(D.nota&&D.nota.length){v(`<h2>Pilih ruangan ${sp('Pilih ruangan')}</h2><div class="cds">${cd('nota()','📚','Nota','Nota','#1b5e32','#e3f1e6')}${cd('kuiz()','📝','Kuiz / Ujian','Kuiz atau Ujian','#b8860b','#fbf1cf')}</div>`);return}
   kuiz();
 }
 function kuiz(){
